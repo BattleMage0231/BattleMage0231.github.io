@@ -69,7 +69,7 @@ function updateElements() {
 function buttonClicked() {
     if(!videoPlayed && Math.random() <= 0.05) {
         getById('embed').innerHTML =
-        `<iframe width="560" height="315" src="https://www.youtube.com/embed/oHg5SJYRHA0?autoplay=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        `<iframe width="560" height="315" src="https://www.youtube.com/embed/oHg5SJYRHA0?autoplay=1&rel=0&modestbranding=1&autohide=1&showinfo=0&controls=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
         videoPlayed = true;
         setTimeout(
             () => getById('embed').innerHTML = '',
