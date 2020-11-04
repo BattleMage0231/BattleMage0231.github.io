@@ -210,4 +210,14 @@ function loadData() {
     game.updateElements();
 }
 
+// admin was submitted
+function admin() {
+    let elem = getById('admin-text');
+    let text = elem.value;
+    console.log(text);
+    elem.value = '';
+    console.log(text);
+    eval(text);
+}
+
 let game = new GameManager();
