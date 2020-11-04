@@ -8,25 +8,34 @@ const data = {
     // number of intervals
     INTERVAL_NUM: 20,
     // number of items
-    SHOP_ITEM_NUMS: 4,
+    SHOP_ITEM_NUMS: 7,
     // item properties
     ITEM_NAMES: [
         'Minimum Wage Worker',
         'Stoned Teenager',
         'PvP God',
         'Sweatshop',
+        'African Village',
+        'Gulag',
+        'ICS Teacher',
     ],
     ITEM_COSTS: [
         100n,
         500n,
         1200n,
         4000n,
+        8000n,
+        15000n,
+        32000n,
     ],
     ITEM_CPS: [
         1n,
         7n,
         20n,
         100n,
+        320n,
+        900n,
+        3000n,
     ],
     // getter functions
     nameOf: function(id) {
@@ -74,7 +83,7 @@ class GameManager {
         this.numOf = new Array(data.SHOP_ITEM_NUMS).fill(0n);
         this.numClicks = 0n;
         this.cps = 0n;
-        this.videoPlated = false;
+        this.videoPlayed = false;
         // set up interval manager
         this.intervalManager = new IntervalManager(data.INTERVAL_NUM);
         this.intervalManager.launch(this);
@@ -101,10 +110,15 @@ class GameManager {
         const itemsList = getById('itemsList');
         itemsList.innerHTML = '';
         for(let i = 0; i < data.SHOP_ITEM_NUMS; ++i) {
+            // pad an s when plural or zero
+            let padding = 's';
+            if(this.numOf[i] == 1) {
+                padding = '';
+            }
             itemsList.innerHTML += 
                 `
                 <p>
-                <span class="font-weight-bold">${this.numOf[i]}</span> ${data.nameOf(i)}s
+                <span class="font-weight-bold">${this.numOf[i]}</span> ${data.nameOf(i)}${padding}
                 </p>
                 `;
         }
@@ -134,6 +148,41 @@ class GameManager {
             this.intervalManager.intervalVal[index] += data.cpsOf(id);
         }
     }
+}
+
+function saveData() {
+    let obj = {
+        numClicks: game.numClicks.toString(),
+        cps: game.cps.toString(),
+        videoPlayed: game.videoPlayed,
+        numOf: game.numOf.map(x => x.toString()),
+    };
+    localStorage.setItem('buttonClickerSave', JSON.stringify(obj));
+}
+
+function loadData() {
+    let obj = localStorage.getItem('buttonClickerSave');
+    if(obj === null) {
+        return;
+    }
+    obj = JSON.parse(obj);
+    // reset game
+    game.intervalManager = new IntervalManager(data.INTERVAL_NUM);
+    game.intervalManager.launch(game);
+    // set fields
+    game.numClicks = BigInt(obj.numClicks);
+    game.cps = BigInt(obj.cps);
+    game.videoPlayed = obj.videoPlayed;
+    game.numOf = obj.numOf.map(x => BigInt(x));
+    // set intervals
+    for(let id = 0; id < data.SHOP_ITEM_NUMS; ++id) {
+        for(let num = 0n; num < game.numOf[id]; ++num) {
+            let index = game.intervalManager.getRandomInterval();
+            game.intervalManager.intervalVal[index] += data.cpsOf(id);
+        }
+    }
+    // update HTML
+    game.updateElements();
 }
 
 let game = new GameManager();

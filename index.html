@@ -12,13 +12,10 @@
                 <hr class="bg-dark"/>
                 <div id="embed" style="pointer-events: none"></div>
                 <button onclick="game.buttonClicked()" class="btn btn-dark mb-3">Click Me</button>
-                <p>You have clicked the button 
+                <p>You have 
                     <span class="font-weight-bold" id="clickCounter">0</span>
-                 times.
+                 clicks to spend.
                 </p>
-                <hr class="bg-dark"/>
-                <p class="font-weight-bold">You have:</p>
-                <div id="itemsList"></div>
             </div>
             <div class="jumbotron">
                 <div id="shop">
@@ -78,7 +75,58 @@
                             <label>4000 clicks / 100 cps</label>
                         </div>
                     </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-3">
+                            <button class="btn btn-primary" onclick="game.attemptBuy(4, 1n)">African Village</button>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(4, 10n)">10x</button>
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(4, 100n)">100x</button>
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(4, 1000n)">1000x</button>
+                        </div>
+                        <div class="col">
+                            <label>8000 clicks / 320 cps</label>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-3">
+                            <button class="btn btn-primary" onclick="game.attemptBuy(5, 1n)">Gulag</button>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(5, 10n)">10x</button>
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(5, 100n)">100x</button>
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(5, 1000n)">1000x</button>
+                        </div>
+                        <div class="col">
+                            <label>15000 clicks / 900 cps</label>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-3">
+                            <button class="btn btn-primary" onclick="game.attemptBuy(6, 1n)">ICS Teacher</button>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(6, 10n)">10x</button>
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(6, 100n)">100x</button>
+                            <button class="btn btn-secondary" onclick="game.attemptBuy(6, 1000n)">1000x</button>
+                        </div>
+                        <div class="col">
+                            <label>32000 clicks / 3000 cps</label>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="jumbotron">
+                <p class="font-weight-bold">You have:</p>
+                <div id="itemsList"></div>
+            </div>
+            <div class="jumbotron">
+                <h5 class="mb-3">Save/Load Data</h5>
+                <button class="btn btn-success" onclick="saveData()">Save</button>
+                <button class="btn btn-info" onclick="loadData()">Load</button>
             </div>
         </div>
         <script>
