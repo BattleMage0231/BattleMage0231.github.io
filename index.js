@@ -7,6 +7,8 @@ function getById(id) {
 const data = {
     // number of intervals
     INTERVAL_NUM: 20,
+    // maximum number of intervals per purchase
+    MAX_INTERVAL_PURCHASE: 40n,
     // number of items
     SHOP_ITEM_NUMS: 7,
     // item properties
@@ -55,13 +57,13 @@ class IntervalManager {
     // creates a new instance of IntervalManager with intervalNum intervals per second
     constructor(intervalNum) {
         this.intervalNum = intervalNum;
-        this.intervalVal = new Array(intervalNum).fill(0n);
+        this.intervalVals = new Array(intervalNum).fill(0n);
         this.intervalPtr = 0;
     }
     // start the interval timer
     launch(gameManager) {
         let func = (gameManager) => {
-            gameManager.numClicks += this.intervalVal[this.intervalPtr];
+            gameManager.numClicks += this.intervalVals[this.intervalPtr];
             ++this.intervalPtr;
             this.intervalPtr %= this.intervalNum;
             gameManager.updateElements();
@@ -80,13 +82,17 @@ class IntervalManager {
 class GameManager {
     // creates a new instance of GameManager
     constructor() {
-        this.numOf = new Array(data.SHOP_ITEM_NUMS).fill(0n);
+        this.itemAmounts = new Array(data.SHOP_ITEM_NUMS).fill(0n);
         this.numClicks = 0n;
         this.cps = 0n;
         this.videoPlayed = false;
         // set up interval manager
         this.intervalManager = new IntervalManager(data.INTERVAL_NUM);
         this.intervalManager.launch(this);
+    }
+
+    numberOf(id) {
+        return this.itemAmounts[id];
     }
 
     // the button was pressed once
@@ -106,19 +112,21 @@ class GameManager {
 
     // updates all HTML elements
     updateElements() {
-        getById('clickCounter').innerText = this.numClicks.toString();
+        let clickString = this.numClicks.toString();
+        getById('clickCounter').innerText = clickString;
+        getById('topClickCounter').innerText = clickString;
         const itemsList = getById('itemsList');
         itemsList.innerHTML = '';
         for(let i = 0; i < data.SHOP_ITEM_NUMS; ++i) {
             // pad an s when plural or zero
             let padding = 's';
-            if(this.numOf[i] == 1) {
+            if(this.numberOf(i) == 1) {
                 padding = '';
             }
             itemsList.innerHTML += 
                 `
                 <p>
-                <span class="font-weight-bold">${this.numOf[i]}</span> ${data.nameOf(i)}${padding}
+                <span class="font-weight-bold">${this.numberOf(i)}</span> ${data.nameOf(i)}${padding}
                 </p>
                 `;
         }
@@ -130,23 +138,43 @@ class GameManager {
         `;
     }
 
+    // unconditionally buy amt of id
+    buy(id, amt) {
+        // update data values
+        this.itemAmounts[id] += amt;
+        this.cps += data.cpsOf(id) * amt;
+        // update HTML elements
+        this.updateElements();
+        // update interval
+        // loop over every item if there are less than 40
+        if(amt <= data.MAX_INTERVAL_PURCHASE) {
+            for(let i = 0; i < amt; ++i) {
+                let index = this.intervalManager.getRandomInterval();
+                this.intervalManager.intervalVals[index] += data.cpsOf(id);
+            }
+        } else {
+            // loop over segments of items if there are more than 40
+            let segment = amt / data.MAX_INTERVAL_PURCHASE;
+            for(let i = 0; i < data.MAX_INTERVAL_PURCHASE; ++i) {
+                let index = this.intervalManager.getRandomInterval();
+                this.intervalManager.intervalVals[index] += data.cpsOf(id) * segment;
+            }
+            // leftover extra cps
+            let extra = amt % data.MAX_INTERVAL_PURCHASE;
+            let index = this.intervalManager.getRandomInterval();
+            this.intervalManager.intervalVals[index] += data.cpsOf(id) * extra;
+        }
+    }
+
     // attempt to buy amt of id
     attemptBuy(id, amt) {
         // not enough clicks
         if(data.costOf(id) * amt > this.numClicks) {
             return;
         }
-        // update data values
+        // buy
         this.numClicks -= data.costOf(id) * amt;
-        this.numOf[id] += amt;
-        this.cps += data.cpsOf(id) * amt;
-        // update HTML elements
-        this.updateElements();
-        // update interval
-        for(let i = 0; i < amt; ++i) {
-            let index = this.intervalManager.getRandomInterval();
-            this.intervalManager.intervalVal[index] += data.cpsOf(id);
-        }
+        this.buy(id, amt);
     }
 }
 
@@ -155,7 +183,7 @@ function saveData() {
         numClicks: game.numClicks.toString(),
         cps: game.cps.toString(),
         videoPlayed: game.videoPlayed,
-        numOf: game.numOf.map(x => x.toString()),
+        itemAmounts: game.itemAmounts.map(x => x.toString()),
     };
     localStorage.setItem('buttonClickerSave', JSON.stringify(obj));
 }
@@ -173,13 +201,10 @@ function loadData() {
     game.numClicks = BigInt(obj.numClicks);
     game.cps = BigInt(obj.cps);
     game.videoPlayed = obj.videoPlayed;
-    game.numOf = obj.numOf.map(x => BigInt(x));
+    game.itemAmounts = obj.itemAmounts.map(x => BigInt(x));
     // set intervals
     for(let id = 0; id < data.SHOP_ITEM_NUMS; ++id) {
-        for(let num = 0n; num < game.numOf[id]; ++num) {
-            let index = game.intervalManager.getRandomInterval();
-            game.intervalManager.intervalVal[index] += data.cpsOf(id);
-        }
+        game.buy(id, game.numberOf(id));
     }
     // update HTML
     game.updateElements();
