@@ -11,7 +11,7 @@
                 <p class="font-italic">"Because who doesn't love clicking buttons?"</p>
                 <hr class="bg-dark"/>
                 <div id="embed" style="pointer-events: none"></div>
-                <button onclick="buttonClicked()" class="btn btn-dark mb-3">Click Me</button>
+                <button onclick="game.buttonClicked()" class="btn btn-dark mb-3">Click Me</button>
                 <p>You have clicked the button 
                     <span class="font-weight-bold" id="clickCounter">0</span>
                  times.
@@ -25,7 +25,7 @@
                     <h5 class="mb-3">Shop</h5>
                     <div class="row">
                         <div class="col-3">
-                            <button class="btn btn-primary" onclick="buy(0)">Minimum Wage Worker</button>
+                            <button class="btn btn-primary" onclick="game.attemptBuy(0, 1n)">Minimum Wage Worker</button>
                         </div>
                         <div class="col">
                             <label>100 clicks / 1 cps</label>
@@ -34,7 +34,7 @@
                     <br>
                     <div class="row">
                         <div class="col-3">
-                            <button class="btn btn-primary" onclick="buy(1)">Stoned Teenager</button>
+                            <button class="btn btn-primary" onclick="game.attemptBuy(1, 1n)">Stoned Teenager</button>
                         </div>
                         <div class="col">
                             <label>500 clicks / 7 cps</label>
@@ -43,7 +43,7 @@
                     <br>
                     <div class="row">
                         <div class="col-3">
-                            <button class="btn btn-primary" onclick="buy(2)">PvP God</button>
+                            <button class="btn btn-primary" onclick="game.attemptBuy(2, 1n)">PvP God</button>
                         </div>
                         <div class="col">
                             <label>1200 clicks / 20 cps</label>
@@ -52,7 +52,7 @@
                     <br>
                     <div class="row">
                         <div class="col-3">
-                            <button class="btn btn-primary" onclick="buy(3)">Sweatshop</button>
+                            <button class="btn btn-primary" onclick="game.attemptBuy(3, 1n)">Sweatshop</button>
                         </div>
                         <div class="col">
                             <label>4000 clicks / 100 cps</label>
@@ -64,7 +64,7 @@
         <script>
         // initial display
 
-        updateElements();
+        game.updateElements();
         </script>
     </body>
 </html>
