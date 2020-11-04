@@ -1,7 +1,20 @@
+'use strict';
+
 // constant data
 
 function getById(id) {
     return document.getElementById(id);
+}
+
+function shuffleArray(arr) {
+    console.log(arr);
+    for (let i = arr.length - 1; i > 0; --i) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    console.log(arr);
 }
 
 const data = {
@@ -49,6 +62,39 @@ const data = {
     cpsOf: function(id) {
         return this.ITEM_CPS[id];
     },
+    // cool facts
+    NUM_COOL_FACTS: 29,
+    COOL_FACTS: [
+        'The phrase "goosebumps" was named after a man who died after being attacked by wild geese.',
+        'The pineapple is the second most erotic fruit, next to the watermelon.',
+        'Lake Superior was artificially created in 1920 to allow more fish to spawn locally.',
+        'Most supercomputers are built with HTML5, the fastest and most verbose programming language.',
+        'Experts suspect that Prime Minister John A. Macdonald was gay.',
+        'In 2018, Discord was accused of shipping supplies to political terrorists during the Iraq Civil War.',
+        'Statistically, you have a best friend named Joe.',
+        'It is perfectly legal to show up naked to court in some states in the US.',
+        'Space smells like the back of a Playstation 4.',
+        'Unicorns existed in Madagascar until going extinct in the 15th century.',
+        'Bumblebees are incable of love.',
+        'In the Bible, the word "ant" is more common than the word "man".',
+        'Originally, the French planed to use the Statue of Liberty as a Trojan Horse.',
+        'Slavery is still legal in the Yukon and Northwest Territories.',
+        'The blobfish was named after its discoverer, Steven T. Blob.',
+        'Water was deadly to humans until 700BC.',
+        'Forced laughter can take weeks off your life expectancy',
+        'Some vaccines can cause you to exhibit fish-like characteristics.',
+        'In 2011, the RCMP was briefly disbanded after catching every single criminal.',
+        'Animals are four times more likely to be arrested in China than the United States.',
+        'To live longer, the Queen of England engages in intense physical activity everyday.',
+        'In Sweden, you can get arrested for using substitute swear words such as "frick".',
+        'Some parts of Star Wars and Star Trek were actually filmed in space.',
+        'The US government invented the hamburger to inflate the economy.',
+        'All sharks suffer from Dissociative Identity Disorder.',
+        'The Bermuda Triangle is actually a cyclic quadrilateral.',
+        'It is impossible for fire hydrants to ejaculate in November.',
+        'The toad is a sacred animal in Japan. Frogs, however, are believed to be embodimenst of the devil.',
+        'The American Mathematics Contest outsources much of its problem setting to India.',
+    ],
 };
 
 // manage intervals and automatic click incrementation
@@ -84,15 +130,25 @@ class GameManager {
     constructor() {
         this.itemAmounts = new Array(data.SHOP_ITEM_NUMS).fill(0n);
         this.numClicks = 0n;
+        this.numButtonClicks = 0n;
         this.cps = 0n;
         this.videoPlayed = false;
         // set up interval manager
         this.intervalManager = new IntervalManager(data.INTERVAL_NUM);
         this.intervalManager.launch(this);
+        // cool fact cache
+        this.coolFactCache = data.COOL_FACTS;
+        console.log(this.coolFactCache);
+        shuffleArray(this.coolFactCache);
+        console.log(this.coolFactCache);
     }
 
     numberOf(id) {
         return this.itemAmounts[id];
+    }
+
+    getCoolFact(x) {
+        return this.coolFactCache[x];
     }
 
     // the button was pressed once
@@ -106,6 +162,7 @@ class GameManager {
                 215000
             )
         }
+        ++this.numButtonClicks;
         ++this.numClicks;
         this.updateElements();
     }
@@ -136,6 +193,15 @@ class GameManager {
         You are automatically producing <span class="font-weight-bold">${this.cps}</span> clicks per second.
         </p>
         `;
+        // cool fact
+        if(this.numButtonClicks % 100n == 0n) {
+            let fact = this.getCoolFact(Math.floor(Number(this.numButtonClicks / 100n)));
+            if(fact) {
+                getById('fact').innerText = fact;
+            } else {
+                getById('fact').innerText = 'The line below is a scam. There are no more cool facts.';
+            }
+        }
     }
 
     // unconditionally buy amt of id
